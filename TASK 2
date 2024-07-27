@@ -1,0 +1,142 @@
+// DESIGN CODE
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity OddOnesDetector_FSM is
+    Port (
+        clk : in STD_LOGIC;
+        reset : in STD_LOGIC;
+        input_bit : in STD_LOGIC;
+        odd_detected : out STD_LOGIC
+    );
+end OddOnesDetector_FSM;
+
+architecture Behavioral of OddOnesDetector_FSM is
+    type state_type is (Even, Odd);
+    signal current_state, next_state : state_type;
+begin
+    -- Sequential logic for state transition
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            current_state <= Even;  -- Initial state
+        elsif rising_edge(clk) then
+            current_state <= next_state;
+        end if;
+    end process;
+    -- Combinational logic for state transition and output
+    process(current_state, input_bit)
+    begin
+        case current_state is
+            when Even =>
+                if input_bit = '1' then
+                    next_state <= Odd;
+                else
+                    next_state <= Even;
+                end if;
+                odd_detected <= '0';  -- Output '0' when in Even state
+            when Odd =>
+                if input_bit = '1' then
+                    next_state <= Even;
+                else
+                    next_state <= Odd;
+                end if;
+                odd_detected <= '1';  -- Output '1' when in Odd state
+        end case;
+    end process;
+end Behavioral;
+
+// TESTBENCH CODE
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity OddOnesDetector_TB is
+end OddOnesDetector_TB;
+
+architecture Behavioral of OddOnesDetector_TB is
+    constant clk_period : time := 10 ns;  -- Clock period definition
+
+    signal clk, reset, input_bit, odd_detected : std_logic;
+    
+    -- Component declaration for DUT (Device Under Test)
+    component OddOnesDetector_FSM
+        Port (
+            clk : in STD_LOGIC;
+            reset : in STD_LOGIC;
+            input_bit : in STD_LOGIC;
+            odd_detected : out STD_LOGIC
+        );
+    end component;
+
+begin
+
+    -- Clock process definition
+    clk_process: process
+    begin
+        while now < 100 ns loop
+            clk <= '0';
+            wait for clk_period / 2;
+            clk <= '1';
+            wait for clk_period / 2;
+        end loop;
+        wait;
+    end process;
+
+    -- Reset process definition
+    reset_process: process
+    begin
+        reset <= '1';
+        wait for 20 ns;
+        reset <= '0';
+        wait;
+    end process;
+
+    -- Stimulus process definition
+    stimulus_process: process
+    begin
+        wait for 30 ns;  -- Wait for initial stabilization
+
+        -- Test case 1: Input sequence "1010"
+        input_bit <= '1';
+        wait for clk_period;
+        input_bit <= '0';
+        wait for clk_period;
+        input_bit <= '1';
+        wait for clk_period;
+        input_bit <= '0';
+        wait for clk_period;
+
+        -- Test case 2: Input sequence "111"
+        input_bit <= '1';
+        wait for clk_period;
+        input_bit <= '1';
+        wait for clk_period;
+        input_bit <= '1';
+        wait for clk_period;
+
+        -- Test case 3: Input sequence "1001"
+        input_bit <= '1';
+        wait for clk_period;
+        input_bit <= '0';
+        wait for clk_period;
+        input_bit <= '0';
+        wait for clk_period;
+        input_bit <= '1';
+        wait for clk_period;
+
+        -- End of testbench
+        wait;
+    end process;
+
+    -- Instantiate the DUT
+    DUT : OddOnesDetector_FSM
+        port map (
+            clk => clk,
+            reset => reset,
+            input_bit => input_bit,
+            odd_detected => odd_detected
+        );
+
+end Behavioral;
