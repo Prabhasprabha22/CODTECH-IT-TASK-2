@@ -59,4 +59,5 @@ The primary objective of this project is to design a Finite State Machine (FSM) 
 
 This overview outlines a structured approach to FSM design and verification, providing clear milestones and deliverables to ensure the project's success.
 
-![ME](https://github.com/user-attachments/assets/d2e18132-3904-4c09-b45b-d668b962919a)
+![Edit code - EDA Playground - Google Chrome 27-07-2024 11_49_52](https://github.com/user-attachments/assets/124e97a0-01ed-4603-acea-e0644c0c30c3)
+
